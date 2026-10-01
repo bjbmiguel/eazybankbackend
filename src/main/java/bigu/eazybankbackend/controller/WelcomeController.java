@@ -3,14 +3,11 @@ package bigu.eazybankbackend.controller;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.authentication.password.CompromisedPasswordDecision;
 import org.springframework.security.authentication.password.CompromisedPasswordException;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("api/v1/welcome")
-
+//@CrossOrigin  //One of the many way to solve CORS issue on the server side...
 public class WelcomeController {
 
     private final CompromisedPasswordChecker compromisedPasswordChecker;
@@ -20,15 +17,15 @@ public class WelcomeController {
     }
 
     @GetMapping
-    public String sayHi(){
+    public String sayHi() {
         return "Welcome to Spring Application with security!";
     }
 
-    @GetMapping("/is-compromised/{password}")
-    public String checkPassword(@PathVariable String password) {
+    @PostMapping("/is-compromised")
+    public String checkPassword(@RequestBody PasswordRequest request) {
 
         CompromisedPasswordDecision decision =
-                compromisedPasswordChecker.check(password);
+                compromisedPasswordChecker.check(request.password());
 
         if (decision.isCompromised()) {
             throw new CompromisedPasswordException(
@@ -38,4 +35,5 @@ public class WelcomeController {
 
         return "The provided password is not compromised";
     }
+
 }
