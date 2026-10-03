@@ -101,7 +101,7 @@ public class ProjectSecurityConfig {
             );
         }
         Map<String, PasswordEncoder> encoders = new HashMap<>();
-
+         //BCrypt baseia-se no EksBlowfish
         encoders.put(
                 "bcrypt",
                 new BCryptPasswordEncoder(version, bcryptProperties.getStrength(), new SecureRandom())
