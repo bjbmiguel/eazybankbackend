@@ -21,7 +21,9 @@ public class Customer {
     @ToString.Include
     @EqualsAndHashCode.Exclude
     private String email;
+
     @Column(length = 200)
     private String pwd;
+
     private String role;
 }
