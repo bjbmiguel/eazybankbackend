@@ -1,5 +1,7 @@
 package bigu.eazybankbackend.config;
 
+import com.password4j.Argon2Function;
+import com.password4j.types.Argon2;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -8,10 +10,14 @@ import org.springframework.security.authentication.password.CompromisedPasswordC
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.argon2.Argon2PasswordEncoder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.crypto.password.Pbkdf2PasswordEncoder;
+import org.springframework.security.crypto.password4j.Argon2Password4jPasswordEncoder;
 import org.springframework.security.crypto.password4j.BcryptPassword4jPasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
@@ -81,35 +87,19 @@ public class ProjectSecurityConfig {
     }
 */
 
+    /*
+
     @Bean
     public PasswordEncoder passwordEncoder() {
-        // Validação defensiva da versão
-        BCryptPasswordEncoder.BCryptVersion version = switch (bcryptProperties.getVersion().toUpperCase()) {
-            case "2A" -> BCryptPasswordEncoder.BCryptVersion.$2A;
-            case "2B" -> BCryptPasswordEncoder.BCryptVersion.$2B;
-            case "2Y" -> BCryptPasswordEncoder.BCryptVersion.$2Y;
-            default -> throw new IllegalArgumentException(
-                    "Versão BCrypt inválida: '" + bcryptProperties.getVersion() + "'. Valores aceitos: 2A, 2B, 2Y"
-            );
-        };
-
-        // Validação defensiva do strength (log rounds)
-        if (bcryptProperties.getStrength() < 4 || bcryptProperties.getStrength() > 31) {
-            throw new IllegalArgumentException(
-                    "Strength BCrypt inválido: " + bcryptProperties.getStrength() +
-                            ". O valor deve estar entre 4 e 31 (inclusive)."
-            );
-        }
+        String idForEncode = "argon2";//Novas passwords serão sempre geradas usando Argon2.
         Map<String, PasswordEncoder> encoders = new HashMap<>();
-         //BCrypt baseia-se no EksBlowfish
-        encoders.put(
-                "bcrypt",
-                new BCryptPasswordEncoder(version, bcryptProperties.getStrength(), new SecureRandom())
-        );
-
-        return new DelegatingPasswordEncoder("bcrypt", encoders);
-
+        encoders.put("bcrypt", new BCryptPasswordEncoder());
+        encoders.put(idForEncode, new Argon2Password4jPasswordEncoder(Argon2Function.getInstance(16_384, 2,1, 32, Argon2.ID, 19)));//Dev
+        //encoders.put(idForEncode, new Argon2Password4jPasswordEncoder(Argon2Function.getInstance(65_536, 3,2, 32, Argon2.ID, 19))); //PRD
+       return  new DelegatingPasswordEncoder(idForEncode, encoders);
     }
+     */
+
 
      @Bean
     public CompromisedPasswordChecker compromisedPasswordChecker() {
