@@ -13,15 +13,15 @@ import org.springframework.security.web.authentication.password.HaveIBeenPwnedRe
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
-@Profile("!prd")
+@Profile("prd")
 @Configuration
 /*
 @EnableConfigurationProperties tem como função registrar a classe anotada com
- @ConfigurationProperties no contêiner Spring e torná-la um bean gerenciáve
+ @ConfigurationProperties no contêiner Spring e torná-la um bean gerenciável
  */
 @EnableConfigurationProperties(BcryptProperties.class)
 @AllArgsConstructor
-public class ProjectSecurityConfig {
+public class ProjectPrdSecurityConfig {
 
     private final BcryptProperties bcryptProperties;
 
@@ -30,6 +30,7 @@ public class ProjectSecurityConfig {
 
         //http.authorizeHttpRequests((r) -> r.anyRequest().permitAll()); //AuthorizationFilter
         //http.authorizeHttpRequests((r) -> r.anyRequest().denyAll());
+        http.redirectToHttps(withDefaults());//Configura um redirecionamento para Https
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();
             r.requestMatchers("/api/v1/contacts", "/error", "/users/register").permitAll();
