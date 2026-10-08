@@ -30,7 +30,7 @@ public class ProjectPrdSecurityConfig {
 
         //http.authorizeHttpRequests((r) -> r.anyRequest().permitAll()); //AuthorizationFilter
         //http.authorizeHttpRequests((r) -> r.anyRequest().denyAll());
-        http.redirectToHttps(withDefaults());//Configura um redirecionamento para Https
+        http.redirectToHttps(withDefaults());//Configura um redirecionamento das requisi. HTTP para Https
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();
             r.requestMatchers("/api/v1/contacts", "/error", "/users/register").permitAll();
@@ -40,7 +40,6 @@ public class ProjectPrdSecurityConfig {
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults()); //Filtro:BasicAuthenticationFilter...
         http.csrf(AbstractHttpConfigurer::disable);
-
         return http.build();
     }
 
