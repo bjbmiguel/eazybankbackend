@@ -1,4 +1,4 @@
-package bigu.eazybankbackend.config;
+package bigu.eazybankbackend.exception;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

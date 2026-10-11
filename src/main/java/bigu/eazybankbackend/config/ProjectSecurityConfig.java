@@ -1,5 +1,7 @@
 package bigu.eazybankbackend.config;
 
+import bigu.eazybankbackend.exception.CustomAccessDeniedHandler;
+import bigu.eazybankbackend.exception.CustomBasicAuthenticationEntryPoint;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -38,10 +40,16 @@ public class ProjectSecurityConfig {
         });
         //http.formLogin(AbstractHttpConfigurer::disable); //filtro:UsernamePasswordAuthenticationFilter...
         http.formLogin(withDefaults());
-        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())); //Indicamos ao SSecurity qual entryPoint ele deve usar
+        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())); //Indicamos ao SSecurity qual entryPoint ele deve usar, apenas para httpBasic
+        //http.exceptionHandling(ehc-> ehc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));//Config global,
+        http.exceptionHandling(ehc->ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
         http.csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
+    }
+
+    private static HttpSecurity getHttp(HttpSecurity http) {
+        return http;
     }
 
     /*

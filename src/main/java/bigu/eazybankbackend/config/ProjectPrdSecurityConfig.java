@@ -1,5 +1,6 @@
 package bigu.eazybankbackend.config;
 
+import bigu.eazybankbackend.exception.CustomAccessDeniedHandler;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -40,6 +41,7 @@ public class ProjectPrdSecurityConfig {
         //http.formLogin(AbstractHttpConfigurer::disable); //filtro:UsernamePasswordAuthenticationFilter...
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults()); //Filtro:BasicAuthenticationFilter...
+        http.exceptionHandling(ehc->ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
         http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
