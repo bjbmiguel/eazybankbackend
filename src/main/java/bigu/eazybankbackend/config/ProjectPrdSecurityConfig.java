@@ -33,7 +33,8 @@ public class ProjectPrdSecurityConfig {
         http.redirectToHttps(withDefaults());//Configura um redirecionamento das requisi. HTTP para Https
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();
-            r.requestMatchers("/api/v1/contacts", "/error", "/users/register").permitAll();
+            r.requestMatchers("/api/v1/customers/register").hasRole("ADMIN");
+            r.requestMatchers("/api/v1/contacts", "/error" ).permitAll();
             r.anyRequest().authenticated(); //é fundamental terminar as regas de auth com catch-all, caso contrário todas as outras requis serão negadas
         });
         //http.formLogin(AbstractHttpConfigurer::disable); //filtro:UsernamePasswordAuthenticationFilter...

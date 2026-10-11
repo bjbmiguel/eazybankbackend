@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
+import java.util.List;
+
 @Service
 @AllArgsConstructor
 public class CustomerService {
@@ -24,6 +26,9 @@ public class CustomerService {
         return customerRepository.save(customer);
     }
 
+    public List<Customer> findAll(){
+        return customerRepository.findAll();
+    }
     public Customer findByEmail(String email){
         Assert.notNull(email, "Email cannot be bull");
         return customerRepository.findByEmail(email).

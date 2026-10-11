@@ -32,12 +32,13 @@ public class ProjectSecurityConfig {
         //http.authorizeHttpRequests((r) -> r.anyRequest().denyAll());
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();
-            r.requestMatchers("/api/v1/contacts", "/error", "/users/register").permitAll();
+            r.requestMatchers("/api/v1/customers/register").hasRole("ADMIN");
+            r.requestMatchers("/api/v1/contacts", "/error" ).permitAll();
             r.anyRequest().authenticated(); //é fundamental terminar as regas de auth com catch-all, caso contrário todas as outras requis serão negadas
         });
         //http.formLogin(AbstractHttpConfigurer::disable); //filtro:UsernamePasswordAuthenticationFilter...
         http.formLogin(withDefaults());
-        http.httpBasic(withDefaults()); //Filtro:BasicAuthenticationFilter...
+        http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())); //Indicamos ao SSecurity qual entryPoint ele deve usar
         http.csrf(AbstractHttpConfigurer::disable);
 
         return http.build();

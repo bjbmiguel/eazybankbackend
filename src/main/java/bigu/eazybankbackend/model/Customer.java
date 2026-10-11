@@ -1,5 +1,6 @@
 package bigu.eazybankbackend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -23,6 +24,7 @@ public class Customer {
     private String email;
 
     @Column(length = 200)
+    @JsonIgnore
     private String pwd;
 
     private String role;
