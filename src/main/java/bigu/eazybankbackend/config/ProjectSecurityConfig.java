@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 
@@ -32,10 +33,12 @@ public class ProjectSecurityConfig {
 
         //http.authorizeHttpRequests((r) -> r.anyRequest().permitAll()); //AuthorizationFilter
         //http.authorizeHttpRequests((r) -> r.anyRequest().denyAll());
+        //http.sessionManagement(smc-> smc.)
+        //http.sessionManagement(smc->smc.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::changeSessionId).invalidSessionUrl("/invalidSession").maximumSessions(1));
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();
             r.requestMatchers("/api/v1/customers/register").hasRole("ADMIN");
-            r.requestMatchers("/api/v1/contacts", "/error" ).permitAll();
+            r.requestMatchers("/api/v1/contacts", "/error", "/invalidSession" ).permitAll();
             r.anyRequest().authenticated(); //é fundamental terminar as regas de auth com catch-all, caso contrário todas as outras requis serão negadas
         });
         //http.formLogin(AbstractHttpConfigurer::disable); //filtro:UsernamePasswordAuthenticationFilter...
@@ -48,9 +51,7 @@ public class ProjectSecurityConfig {
         return http.build();
     }
 
-    private static HttpSecurity getHttp(HttpSecurity http) {
-        return http;
-    }
+
 
     /*
                                             java.lang.IllegalArgumentException: Given that there is
