@@ -3,18 +3,24 @@ package bigu.eazybankbackend.controller;
 import bigu.eazybankbackend.model.Customer;
 import bigu.eazybankbackend.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/customers")
 @RequiredArgsConstructor
-public class CustomerController {
+@Slf4j
+public class CustomerController { ///api/v1/customers/register
 
     private final CustomerService customerService;
     private final PasswordEncoder passwordEncoder;
@@ -26,10 +32,11 @@ public class CustomerController {
         return  ResponseEntity.ok().body(customers);
     }
 
-    @PostMapping(params = "/register",  produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/register",  produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> registerUser(@RequestBody Customer customer) {
         try {
             String hashPwd = passwordEncoder.encode(customer.getPwd());
+            customer.setCreateDt(LocalDate.now());
             customer.setPwd(hashPwd);
             Customer savedCustomer = customerService.register(customer);
 
@@ -40,10 +47,17 @@ public class CustomerController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).
                         body("Customer registration failed");
             }
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).
-                    body("An exception occurred during the customer registration: " + ex.getMessage());
+        }catch (Exception ex) {
+            log.error("Error during customer registration", ex);
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An internal error occurred.");
         }
 
+    }
+
+    @GetMapping("/user")
+    public Customer getUserDetailsAfterLogin(Authentication authentication) {
+        return customerService.findByEmail(authentication.getName());
     }
 }

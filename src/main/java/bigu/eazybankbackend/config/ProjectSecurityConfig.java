@@ -2,7 +2,9 @@ package bigu.eazybankbackend.config;
 
 import bigu.eazybankbackend.exception.CustomAccessDeniedHandler;
 import bigu.eazybankbackend.exception.CustomBasicAuthenticationEntryPoint;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
+import org.jspecify.annotations.Nullable;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,6 +15,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+
+import java.util.Collections;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -35,10 +41,24 @@ public class ProjectSecurityConfig {
         //http.authorizeHttpRequests((r) -> r.anyRequest().denyAll());
         //http.sessionManagement(smc-> smc.)
         //http.sessionManagement(smc->smc.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::changeSessionId).invalidSessionUrl("/invalidSession").maximumSessions(1));
+        http.cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
+            @Override
+            public @Nullable CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
+                {
+                    CorsConfiguration corsConfiguration = new CorsConfiguration();
+                    corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
+                    corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
+                    corsConfiguration.setAllowCredentials(true); //Permite que o browser utilize requisições CORS com credenciais, como cookies de sessão e outras credenciais geridas pelo browser, quando as condições do cliente também o permitem.
+                    corsConfiguration.setAllowedHeaders(Collections.singletonList("*")); //Permite todos os cabeçalhos solicitados que a política CORS aceite. Isto inclui, por exemplo, Authorization e Content-Type.
+                    corsConfiguration.setMaxAge(3600L);
+                    return corsConfiguration;
+                }
+            }
+        }));
         http.authorizeHttpRequests(r -> {
-            r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();
+            r.requestMatchers("/api/v1/welcome", "/api/v1/loans", "/api/v1/customers/user").authenticated();
             r.requestMatchers("/api/v1/customers/register").hasRole("ADMIN");
-            r.requestMatchers("/api/v1/contacts", "/error", "/invalidSession" ).permitAll();
+            r.requestMatchers("/api/v1/contacts", "/error", "/invalidSession" ,"/notices").permitAll();
             r.anyRequest().authenticated(); //é fundamental terminar as regas de auth com catch-all, caso contrário todas as outras requis serão negadas
         });
         //http.formLogin(AbstractHttpConfigurer::disable); //filtro:UsernamePasswordAuthenticationFilter...
