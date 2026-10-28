@@ -31,6 +31,7 @@ public class ProjectPrdSecurityConfig {
 
         //http.authorizeHttpRequests((r) -> r.anyRequest().permitAll()); //AuthorizationFilter
         //http.authorizeHttpRequests((r) -> r.anyRequest().denyAll());
+        http.cors(withDefaults());
         http.redirectToHttps(withDefaults());//Configura um redirecionamento das requisi. HTTP para Https
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();

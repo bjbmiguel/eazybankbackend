@@ -41,20 +41,7 @@ public class ProjectSecurityConfig {
         //http.authorizeHttpRequests((r) -> r.anyRequest().denyAll());
         //http.sessionManagement(smc-> smc.)
         //http.sessionManagement(smc->smc.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::changeSessionId).invalidSessionUrl("/invalidSession").maximumSessions(1));
-        http.cors(corsConfig -> corsConfig.configurationSource(new CorsConfigurationSource() {
-            @Override
-            public @Nullable CorsConfiguration getCorsConfiguration(HttpServletRequest request) {
-                {
-                    CorsConfiguration corsConfiguration = new CorsConfiguration();
-                    corsConfiguration.setAllowedOrigins(Collections.singletonList("http://localhost:4200"));
-                    corsConfiguration.setAllowedMethods(Collections.singletonList("*"));
-                    corsConfiguration.setAllowCredentials(true); //Permite que o browser utilize requisições CORS com credenciais, como cookies de sessão e outras credenciais geridas pelo browser, quando as condições do cliente também o permitem.
-                    corsConfiguration.setAllowedHeaders(Collections.singletonList("*")); //Permite todos os cabeçalhos solicitados que a política CORS aceite. Isto inclui, por exemplo, Authorization e Content-Type.
-                    corsConfiguration.setMaxAge(3600L);
-                    return corsConfiguration;
-                }
-            }
-        }));
+        http.cors(withDefaults());
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans", "/api/v1/customers/user").authenticated();
             r.requestMatchers("/api/v1/customers/register").hasRole("ADMIN");
