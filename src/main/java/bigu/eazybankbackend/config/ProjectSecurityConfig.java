@@ -55,11 +55,15 @@ public class ProjectSecurityConfig {
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));//Usado durante o login..
         http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class); //Depois do 'BasicAuthenticationFilter', executa o filter... Usado durente o login apenas
         http.authorizeHttpRequests(r -> {
-            r.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
-                    .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT")
-                    .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
-                    .requestMatchers("/myCards").hasAuthority("VIEWCARDS");
-            r.requestMatchers("/api/v1/welcome", "/api/v1/loans", "/api/v1/customers/user", "/api/v1/customers/register").authenticated();
+             /*.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+                        .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT")
+                        .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
+                        .requestMatchers("/myCards").hasAuthority("VIEWCARDS")*/
+                        r.requestMatchers("/myAccount").hasRole("USER")
+                    .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
+                    .requestMatchers("/myLoans").hasRole("USER")
+                    .requestMatchers("/myCards").hasRole("USER");
+            r.requestMatchers( "/api/v1/customers/register").authenticated();
             r.requestMatchers("/api/v1/contacts/register", "/error", "/invalidSession", "/notices").permitAll();
             r.anyRequest().authenticated(); //é fundamental terminar as regas de auth com catch-all, caso contrário todas as outras requis serão negadas
         });
