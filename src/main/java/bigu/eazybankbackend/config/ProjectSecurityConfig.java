@@ -47,24 +47,27 @@ public class ProjectSecurityConfig {
         //http.authorizeHttpRequests((r) -> r.anyRequest().denyAll());
         //http.sessionManagement(smc-> smc.)
         //http.sessionManagement(smc->smc.sessionFixation(SessionManagementConfigurer.SessionFixationConfigurer::changeSessionId).invalidSessionUrl("/invalidSession").maximumSessions(1));
-        http.securityContext(contextConfig-> contextConfig.requireExplicitSave(false));//Deixar o SSecurity salvar automa. na sessão o SecurityContext no SecurityContextHolder
-        http.sessionManagement(sessionConfig->sessionConfig.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));//Para forçar criar sessão (JSESSIONID) visto que agora usamos uma pág de login costumizado
+        http.securityContext(contextConfig -> contextConfig.requireExplicitSave(false));//Deixar o SSecurity salvar automa. na sessão o SecurityContext no SecurityContextHolder
+        http.sessionManagement(sessionConfig -> sessionConfig.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));//Para forçar criar sessão (JSESSIONID) visto que agora usamos uma pág de login costumizado
         http.cors(withDefaults());
         http.csrf(csrfConfig -> csrfConfig.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
                 .ignoringRequestMatchers("/api/v1/contacts/register", "/api/v1/customers/register") //Para ignorar a proteção do CSRF
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));//Usado durante o login..
         http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class); //Depois do 'BasicAuthenticationFilter', executa o filter... Usado durente o login apenas
         http.authorizeHttpRequests(r -> {
-            r.requestMatchers("/api/v1/welcome", "/api/v1/loans", "/api/v1/customers/user").authenticated();
-            r.requestMatchers("/api/v1/customers/register").hasRole("ADMIN");
-            r.requestMatchers("/api/v1/contacts/register", "/error", "/invalidSession" ,"/notices").permitAll();
+            r.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
+                    .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT")
+                    .requestMatchers("/myLoans").hasAuthority("VIEWLOANS")
+                    .requestMatchers("/myCards").hasAuthority("VIEWCARDS");
+            r.requestMatchers("/api/v1/welcome", "/api/v1/loans", "/api/v1/customers/user", "/api/v1/customers/register").authenticated();
+            r.requestMatchers("/api/v1/contacts/register", "/error", "/invalidSession", "/notices").permitAll();
             r.anyRequest().authenticated(); //é fundamental terminar as regas de auth com catch-all, caso contrário todas as outras requis serão negadas
         });
         //http.formLogin(AbstractHttpConfigurer::disable); //filtro:UsernamePasswordAuthenticationFilter...
         http.formLogin(withDefaults());
         http.httpBasic(hbc -> hbc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint())); //Indicamos ao SSecurity qual entryPoint ele deve usar, apenas para httpBasic
         //http.exceptionHandling(ehc-> ehc.authenticationEntryPoint(new CustomBasicAuthenticationEntryPoint()));//Config global,
-        http.exceptionHandling(ehc->ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
+        http.exceptionHandling(ehc -> ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
         //http.csrf(AbstractHttpConfigurer::disable);
 
         return http.build();
@@ -113,7 +116,7 @@ public class ProjectSecurityConfig {
      */
 
 
-     @Bean
+    @Bean
     public CompromisedPasswordChecker compromisedPasswordChecker() {
         return new HaveIBeenPwnedRestApiPasswordChecker();
     }

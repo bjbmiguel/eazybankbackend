@@ -17,11 +17,9 @@ public class CsrfCookieFilter extends OncePerRequestFilter {
                         CsrfToken.class.getName()
                 );
 
-        System.out.println("csrfToken = " + csrfToken);
-
         if (csrfToken != null) {
             String tk = csrfToken.getToken();
-            System.out.println("Token = " + tk);
+            System.out.println("CSRF Token = " + tk);
         }
         filterChain.doFilter(request, response);
 

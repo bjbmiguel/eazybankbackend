@@ -14,9 +14,23 @@ alter table authorities auto_increment=1;
 INSERT INTO customer (name,email,mobile_number, pwd, role,create_dt)
 VALUES ('Banguela','bjbmiguel@gmail.com','921300965', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_ADMIN',CURDATE());
 
+INSERT INTO customer (name,email,mobile_number, pwd, role,create_dt)
+VALUES ('Stefânia','stefcard@gmail.com','926992165', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_ADMIN',CURDATE());
+
+INSERT INTO customer (name,email,mobile_number, pwd, role,create_dt)
+VALUES ('Mariana','mariana@gmail.com','934600744', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_ADMIN',CURDATE());
+
 
 INSERT INTO `accounts` (`customer_id`, `account_number`, `account_type`, `branch_address`, `create_dt`)
 VALUES (1, 1865764534, 'Savings', '123 Main Street, New York', CURDATE());
+
+INSERT INTO `accounts` (`customer_id`, `account_number`, `account_type`, `branch_address`, `create_dt`)
+VALUES (2, 1865764535, 'Savings', '123 Main Street, New York', CURDATE());
+
+INSERT INTO `accounts` (`customer_id`, `account_number`, `account_type`, `branch_address`, `create_dt`)
+VALUES (3, 1865764536, 'Savings', '123 Main Street, New York', CURDATE());
+
+
 
 INSERT INTO `account_transactions` (`transaction_id`, `account_number`, `customer_id`, `transaction_dt`, `transaction_summary`, `transaction_type`,`transaction_amt`,
                                     `closing_balance`, `create_dt`)  VALUES (UUID(), 1865764534, 1, DATE_SUB(CURDATE(), INTERVAL 7 DAY), 'Coffee Shop', 'Withdrawal', 30,34500,DATE_SUB(CURDATE(), INTERVAL 7 DAY));
@@ -87,6 +101,12 @@ VALUES ('COVID-19 Insurance', 'EazyBank launched an insurance policy which will 
 
 INSERT INTO `authorities` (`customer_id`, `name`)
 VALUES (1, 'VIEWACCOUNT');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (2, 'VIEWACCOUNT');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (3, 'VIEWACCOUNT');
 
 INSERT INTO `authorities` (`customer_id`, `name`)
 VALUES (1, 'VIEWCARDS');
