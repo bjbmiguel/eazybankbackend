@@ -6,6 +6,7 @@ import bigu.eazybankbackend.repository.ContactRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Date;
@@ -13,11 +14,12 @@ import java.util.Random;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/contacts")
 public class ContactController {
 
     private final ContactRepository contactRepository;
 
-    @PostMapping("/contact")
+    @PostMapping("/register")
     public Contact saveContactInquiryDetails(@RequestBody Contact contact) {
         contact.setContactId(getServiceReqNumber());
         contact.setCreateDt(new Date(System.currentTimeMillis()));

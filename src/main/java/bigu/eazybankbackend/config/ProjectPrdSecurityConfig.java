@@ -1,6 +1,7 @@
 package bigu.eazybankbackend.config;
 
 import bigu.eazybankbackend.exception.CustomAccessDeniedHandler;
+import bigu.eazybankbackend.filter.CsrfCookieFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -9,8 +10,12 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
 import static org.springframework.security.config.Customizer.withDefaults;
 
@@ -28,10 +33,16 @@ public class ProjectPrdSecurityConfig {
 
     @Bean
     public SecurityFilterChain customSecurityFilterChain(HttpSecurity http) {
+        CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler(); //Para ler o token...
 
         //http.authorizeHttpRequests((r) -> r.anyRequest().permitAll()); //AuthorizationFilter
         //http.authorizeHttpRequests((r) -> r.anyRequest().denyAll());
+        http.securityContext(contextConfig-> contextConfig.requireExplicitSave(false));//Deixar o SSecureiry salvar o JSESSionid no contextHolder
+        http.sessionManagement(sessionConfig->sessionConfig.sessionCreationPolicy(SessionCreationPolicy.ALWAYS));//Para forçar criar sessão
         http.cors(withDefaults());
+        http.csrf(csrfConfig -> csrfConfig.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));//Usado durante o login..
+        http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class); //Depois do 'BasicAuthenticationFilter', executa o filter... Usado durente o login apenas
         http.redirectToHttps(withDefaults());//Configura um redirecionamento das requisi. HTTP para Https
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();
@@ -43,7 +54,7 @@ public class ProjectPrdSecurityConfig {
         http.formLogin(withDefaults());
         http.httpBasic(withDefaults()); //Filtro:BasicAuthenticationFilter...
         http.exceptionHandling(ehc->ehc.accessDeniedHandler(new CustomAccessDeniedHandler()));
-        http.csrf(AbstractHttpConfigurer::disable);
+        //http.csrf(AbstractHttpConfigurer::disable);
         return http.build();
     }
 

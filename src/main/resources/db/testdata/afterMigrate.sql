@@ -1,5 +1,6 @@
 set foreign_key_checks = 0;
 
+delete  from authorities;
 delete  from account_transactions;
 delete  from accounts;
 delete from customer;
@@ -7,6 +8,8 @@ delete from customer;
 set foreign_key_checks = 1;
 
 alter table customer auto_increment=1;
+alter table authorities auto_increment=1;
+
 
 INSERT INTO customer (name,email,mobile_number, pwd, role,create_dt)
 VALUES ('Banguela','bjbmiguel@gmail.com','921300965', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_ADMIN',CURDATE());
@@ -81,3 +84,21 @@ VALUES ('COVID-19 Insurance', 'EazyBank launched an insurance policy which will 
 
 #insert into customer  (id, email, pwd,role) values(1, 'bjbmiguel@gmail.com', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_ADMIN');
 #insert into customer  (id, email, pwd,role) values(2, 'junior@gmail.com', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_GUEST');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'VIEWACCOUNT');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'VIEWCARDS');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'VIEWLOANS');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'VIEWBALANCE');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'ROLE_USER');
+
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (1, 'ROLE_ADMIN');

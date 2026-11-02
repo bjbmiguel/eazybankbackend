@@ -35,4 +35,11 @@ public class CustomerService {
                 orElseThrow(()->new UsernameNotFoundException("User details not found for the user: " + email));
 
     }
+
+    public Customer findById(Long id){
+        Assert.notNull(id, "ID cannot be bull");
+        return customerRepository.findById(id).
+                orElseThrow(()->new UsernameNotFoundException("User details not found for the user ID: " + id));
+
+    }
 }

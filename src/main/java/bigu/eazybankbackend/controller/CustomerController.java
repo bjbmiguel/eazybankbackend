@@ -1,5 +1,6 @@
 package bigu.eazybankbackend.controller;
 
+import bigu.eazybankbackend.model.Accounts;
 import bigu.eazybankbackend.model.Customer;
 import bigu.eazybankbackend.service.CustomerService;
 import lombok.RequiredArgsConstructor;
@@ -60,4 +61,6 @@ public class CustomerController { ///api/v1/customers/register
     public Customer getUserDetailsAfterLogin(Authentication authentication) {
         return customerService.findByEmail(authentication.getName());
     }
+
+
 }
