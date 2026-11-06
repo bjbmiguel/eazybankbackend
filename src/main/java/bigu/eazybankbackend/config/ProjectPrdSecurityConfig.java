@@ -1,7 +1,10 @@
 package bigu.eazybankbackend.config;
 
 import bigu.eazybankbackend.exception.CustomAccessDeniedHandler;
+import bigu.eazybankbackend.filter.AuthoritiesLoggingAtFilter;
+import bigu.eazybankbackend.filter.AuthoritiesLoggingFilter;
 import bigu.eazybankbackend.filter.CsrfCookieFilter;
+import bigu.eazybankbackend.filter.RequestValidationBeforeFilter;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -43,6 +46,10 @@ public class ProjectPrdSecurityConfig {
         http.csrf(csrfConfig -> csrfConfig.csrfTokenRequestHandler(csrfTokenRequestAttributeHandler)
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));//Usado durante o login..
         http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class); //Depois do 'BasicAuthenticationFilter', executa o filter... Usado durente o login apenas
+        http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class); //Depois do 'BasicAuthenticationFilter', executa o filter... Usado durente o login apenas
+        http.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAfter(new AuthoritiesLoggingFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class);
         http.redirectToHttps(withDefaults());//Configura um redirecionamento das requisi. HTTP para Https
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();

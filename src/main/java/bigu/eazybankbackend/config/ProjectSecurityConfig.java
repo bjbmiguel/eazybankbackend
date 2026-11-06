@@ -2,7 +2,10 @@ package bigu.eazybankbackend.config;
 
 import bigu.eazybankbackend.exception.CustomAccessDeniedHandler;
 import bigu.eazybankbackend.exception.CustomBasicAuthenticationEntryPoint;
+import bigu.eazybankbackend.filter.AuthoritiesLoggingAtFilter;
+import bigu.eazybankbackend.filter.AuthoritiesLoggingFilter;
 import bigu.eazybankbackend.filter.CsrfCookieFilter;
+import bigu.eazybankbackend.filter.RequestValidationBeforeFilter;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.jspecify.annotations.Nullable;
@@ -54,6 +57,9 @@ public class ProjectSecurityConfig {
                 .ignoringRequestMatchers("/api/v1/contacts/register", "/api/v1/customers/register") //Para ignorar a proteção do CSRF
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()));//Usado durante o login..
         http.addFilterAfter(new CsrfCookieFilter(), BasicAuthenticationFilter.class); //Depois do 'BasicAuthenticationFilter', executa o filter... Usado durente o login apenas
+        http.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAfter(new AuthoritiesLoggingFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class);
         http.authorizeHttpRequests(r -> {
              /*.requestMatchers("/myAccount").hasAuthority("VIEWACCOUNT")
                         .requestMatchers("/myBalance").hasAnyAuthority("VIEWBALANCE", "VIEWACCOUNT")
