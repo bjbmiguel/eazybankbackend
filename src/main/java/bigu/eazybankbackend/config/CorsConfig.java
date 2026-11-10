@@ -17,11 +17,12 @@ public class CorsConfig {
 
         config.setAllowedOrigins(List.of("http://localhost:4200"));
         config.setAllowedMethods(List.of("*"));
-        config.setAllowedHeaders(List.of("*"));
+        config.setAllowedHeaders(List.of("*"));//permite o JS do browser enviar o JWT e outros headers no request
+        config.setExposedHeaders(List.of("Authorization"));//permite o JS browser ler o JWT no response.
 
 
         // Ativar apenas se a aplicação precisar de credenciais CORS.
-        config.setAllowCredentials(true);
+        config.setAllowCredentials(true);//em requisições cors, podemos enviar cookies/Id de sessão/CSRF tokens
 
         config.setMaxAge(3600L);
 

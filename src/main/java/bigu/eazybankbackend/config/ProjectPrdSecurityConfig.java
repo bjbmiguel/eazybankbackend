@@ -1,19 +1,21 @@
 package bigu.eazybankbackend.config;
 
 import bigu.eazybankbackend.exception.CustomAccessDeniedHandler;
-import bigu.eazybankbackend.filter.AuthoritiesLoggingAtFilter;
-import bigu.eazybankbackend.filter.AuthoritiesLoggingFilter;
-import bigu.eazybankbackend.filter.CsrfCookieFilter;
-import bigu.eazybankbackend.filter.RequestValidationBeforeFilter;
+import bigu.eazybankbackend.filter.*;
 import lombok.AllArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.env.Environment;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.password.HaveIBeenPwnedRestApiPasswordChecker;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
@@ -35,7 +37,7 @@ public class ProjectPrdSecurityConfig {
     private final BcryptProperties bcryptProperties;
 
     @Bean
-    public SecurityFilterChain customSecurityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain customSecurityFilterChain(HttpSecurity http, Environment environment) {
         CsrfTokenRequestAttributeHandler csrfTokenRequestAttributeHandler = new CsrfTokenRequestAttributeHandler(); //Para ler o token...
 
         //http.authorizeHttpRequests((r) -> r.anyRequest().permitAll()); //AuthorizationFilter
@@ -50,11 +52,13 @@ public class ProjectPrdSecurityConfig {
         http.addFilterBefore(new RequestValidationBeforeFilter(), BasicAuthenticationFilter.class);
         http.addFilterAfter(new AuthoritiesLoggingFilter(), BasicAuthenticationFilter.class);
         http.addFilterAt(new AuthoritiesLoggingAtFilter(), BasicAuthenticationFilter.class);
+        http.addFilterAfter(new JWTTokenGeneratorFilter(environment), BasicAuthenticationFilter.class);
+        http.addFilterBefore(new JWTTokenValidatorFilter(environment), BasicAuthenticationFilter.class);
         http.redirectToHttps(withDefaults());//Configura um redirecionamento das requisi. HTTP para Https
         http.authorizeHttpRequests(r -> {
             r.requestMatchers("/api/v1/welcome", "/api/v1/loans").authenticated();
             r.requestMatchers("/api/v1/customers/register").hasRole("ADMIN");
-            r.requestMatchers("/api/v1/contacts", "/error" ).permitAll();
+            r.requestMatchers("/api/v1/contacts", "/error", "/api/v1/customers/apiLogin").permitAll();
             r.anyRequest().authenticated(); //é fundamental terminar as regas de auth com catch-all, caso contrário todas as outras requis serão negadas
         });
         //http.formLogin(AbstractHttpConfigurer::disable); //filtro:UsernamePasswordAuthenticationFilter...
@@ -122,4 +126,14 @@ public class ProjectPrdSecurityConfig {
         return new DelegatingPasswordEncoder("bcrypt", encoders);
 
          */
+
+    @Bean
+    public AuthenticationManager authenticationManager(UserDetailsService userDetailsService,
+                                                       PasswordEncoder passwordEncoder) {
+        EazyBankProdUserPasswordAuthenticationProvider authenticationProvider =
+                new EazyBankProdUserPasswordAuthenticationProvider(userDetailsService, passwordEncoder);
+        ProviderManager providerManager = new ProviderManager(authenticationProvider);
+        providerManager.setEraseCredentialsAfterAuthentication(false);
+        return  providerManager;
+    }
 }
