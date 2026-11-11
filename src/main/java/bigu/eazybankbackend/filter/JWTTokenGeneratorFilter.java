@@ -21,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
@@ -45,14 +46,15 @@ public class JWTTokenGeneratorFilter extends OncePerRequestFilter {
 
 
                 Instant now = Instant.now();
-
+                List<String> lsAuth = authentication.getAuthorities().stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList();
+            System.out.println(lsAuth);
                 String jwt = Jwts.builder()
                         .issuer("https://auth.eazybank.com")
                         .subject(authentication.getName())
                         .claim("authorities",
-                                authentication.getAuthorities().stream()
-                                        .map(GrantedAuthority::getAuthority)
-                                        .toList())
+                                lsAuth)
                         .issuedAt(Date.from(now))
                         .expiration(Date.from(now.plus(5, ChronoUnit.MINUTES)))
                         .signWith(this.secretKey)

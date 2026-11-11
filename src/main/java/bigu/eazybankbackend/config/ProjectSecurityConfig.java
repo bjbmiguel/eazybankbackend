@@ -14,6 +14,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
@@ -41,6 +42,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
  */
 @EnableConfigurationProperties(BcryptProperties.class)
 @AllArgsConstructor
+@EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)//Essa anotação habilita o mecanismo de autorização nos métodos.
 public class ProjectSecurityConfig {
 
     private final BcryptProperties bcryptProperties;
@@ -71,7 +73,7 @@ public class ProjectSecurityConfig {
                         .requestMatchers("/myCards").hasAuthority("VIEWCARDS")*/
                         r.requestMatchers("/myAccount").hasRole("USER")
                     .requestMatchers("/myBalance").hasAnyRole("USER", "ADMIN")
-                    .requestMatchers("/myLoans").hasRole("USER")
+                    .requestMatchers("/myLoans").authenticated()
                     .requestMatchers("/myCards").hasRole("USER");
             r.requestMatchers( "/api/v1/customers/register").authenticated();
             r.requestMatchers("/api/v1/contacts/register", "/error", "/invalidSession", "/notices", "/api/v1/customers/apiLogin").permitAll();

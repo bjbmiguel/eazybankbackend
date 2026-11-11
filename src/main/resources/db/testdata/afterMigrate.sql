@@ -15,10 +15,10 @@ INSERT INTO customer (name,email,mobile_number, pwd, role,create_dt)
 VALUES ('Banguela','bjbmiguel@gmail.com','921300965', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_ADMIN',CURDATE());
 
 INSERT INTO customer (name,email,mobile_number, pwd, role,create_dt)
-VALUES ('Stefânia','stefcard@gmail.com','926992165', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_ADMIN',CURDATE());
+VALUES ('Stefânia','stefcard@gmail.com','926992165', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_USER',CURDATE());
 
 INSERT INTO customer (name,email,mobile_number, pwd, role,create_dt)
-VALUES ('Mariana','mariana@gmail.com','934600744', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_ADMIN',CURDATE());
+VALUES ('Mariana','mariana@gmail.com','934600744', '{argon2}$argon2id$v=19$m=19456,t=2,p=1$UlUxSzZYZ0lGSXMwMDRpcQ$bqLPeNr2TswtvGSofVvSjZM/ySLrds2dpuns2QYSE5Y', 'ROLE_USER',CURDATE());
 
 
 INSERT INTO `accounts` (`customer_id`, `account_number`, `account_type`, `branch_address`, `create_dt`)
@@ -118,7 +118,9 @@ INSERT INTO `authorities` (`customer_id`, `name`)
 VALUES (1, 'VIEWBALANCE');
 
 INSERT INTO `authorities` (`customer_id`, `name`)
-VALUES (1, 'ROLE_USER');
-
-INSERT INTO `authorities` (`customer_id`, `name`)
 VALUES (1, 'ROLE_ADMIN');
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (2, 'ROLE_USER');
+INSERT INTO `authorities` (`customer_id`, `name`)
+VALUES (3, 'ROLE_USER');
+

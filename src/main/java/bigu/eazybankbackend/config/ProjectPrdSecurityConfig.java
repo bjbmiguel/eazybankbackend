@@ -11,6 +11,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.password.CompromisedPasswordChecker;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -32,6 +33,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
  */
 @EnableConfigurationProperties(BcryptProperties.class)
 @AllArgsConstructor
+@EnableMethodSecurity(jsr250Enabled = true, securedEnabled = true)//Essa anotação habilita o mecanismo de autorização nos métodos.
 public class ProjectPrdSecurityConfig {
 
     private final BcryptProperties bcryptProperties;

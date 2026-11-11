@@ -14,7 +14,8 @@ import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 import org.springframework.security.web.util.matcher.OrRequestMatcher;
@@ -24,12 +25,14 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import javax.crypto.SecretKey;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 public class JWTTokenValidatorFilter extends OncePerRequestFilter {
 
     private final RequestMatcher excludedEndpoints =
             new OrRequestMatcher(
+                    PathPatternRequestMatcher.withDefaults().matcher("/api/v1/contacts/register"),
                     PathPatternRequestMatcher.withDefaults()
                             .matcher("/api/v1/customers/user"),
 
@@ -67,9 +70,15 @@ public class JWTTokenValidatorFilter extends OncePerRequestFilter {
             }
 
             String userName = claims.getSubject();
-            String authorities = String.valueOf(claims.get("authorities", List.class));
+            List<String> authorities = claims.get("authorities", List.class);
+
+            List<GrantedAuthority> grantedAuthorities =
+                    authorities.stream()
+                            .map(SimpleGrantedAuthority::new)
+                            .collect(Collectors.toList());
+
             Authentication authentication = new UsernamePasswordAuthenticationToken(userName, null,
-                    AuthorityUtils.commaSeparatedStringToAuthorityList(authorities));
+                    grantedAuthorities);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
 

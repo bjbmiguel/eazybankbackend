@@ -1,10 +1,12 @@
 package bigu.eazybankbackend.controller;
 
+import bigu.eazybankbackend.config.JWTSecretKey;
 import bigu.eazybankbackend.constants.ApplicationConstants;
 import bigu.eazybankbackend.model.Customer;
 import bigu.eazybankbackend.model.LoginRequestDTO;
 import bigu.eazybankbackend.model.LoginResponseDTO;
 import bigu.eazybankbackend.service.CustomerService;
+import ch.qos.logback.core.util.StringCollectionUtil;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +20,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.crypto.SecretKey;
@@ -86,8 +89,7 @@ public class CustomerController { ///api/v1/customers/register
         Authentication authenticationResponse = authenticationManager.authenticate(authentication);
         if(null != authenticationResponse && authenticationResponse.isAuthenticated()) {
             if (null != env) {
-                String secret = env.getRequiredProperty(ApplicationConstants.JWT_SECRET);
-                SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
+                SecretKey secretKey = JWTSecretKey.getSKey(env.getRequiredProperty(ApplicationConstants.JWT_SECRET));
                  jwt = Jwts.builder()
                         .issuer("https://auth.eazybank.com")
                         .subject(authenticationResponse.getName())
@@ -101,6 +103,7 @@ public class CustomerController { ///api/v1/customers/register
                         .compact();
             }
         }
+
         return ResponseEntity.status(HttpStatus.OK).header(ApplicationConstants.JWT_HEADER,jwt)
                 .body(new LoginResponseDTO(HttpStatus.OK.getReasonPhrase(), jwt));
     }
