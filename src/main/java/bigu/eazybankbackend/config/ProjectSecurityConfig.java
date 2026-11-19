@@ -45,8 +45,7 @@ public class ProjectSecurityConfig {
         );
     }
 
-    //453342691049-cf7q02ilmg1aa8qet6f8dplrb8rf92gn.apps.googleusercontent.com
-    //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
+
     private ClientRegistration googleClientRegistration() {
         return CommonOAuth2Provider.GOOGLE
                 .getBuilder("google")
@@ -65,8 +64,7 @@ public class ProjectSecurityConfig {
     }
      */
 
-    //Ov23liS6T9QS71tzZuo9
-    //d07c26eba695d862714104e3068f721fa7643754
+
     @Bean
     public ClientRegistration githubClientRegistration() {
         return CommonOAuth2Provider.GITHUB
