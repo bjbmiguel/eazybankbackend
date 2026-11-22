@@ -36,9 +36,6 @@ import java.util.stream.Collectors;
 public class CustomerController { ///api/v1/customers/register
 
     private final CustomerService customerService;
-    private final PasswordEncoder passwordEncoder;
-    private final Environment env;
-    private final AuthenticationManager authenticationManager;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Customer>> getCustomers(){
@@ -47,29 +44,6 @@ public class CustomerController { ///api/v1/customers/register
         return  ResponseEntity.ok().body(customers);
     }
 
-    @PostMapping(path = "/register",  produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<String> registerUser(@RequestBody Customer customer) {
-        try {
-            String hashPwd = passwordEncoder.encode(customer.getPwd());
-            customer.setCreateDt(LocalDate.now());
-            customer.setPwd(hashPwd);
-            Customer savedCustomer = customerService.register(customer);
-
-            if(savedCustomer.getId()>0) {
-                return ResponseEntity.status(HttpStatus.CREATED).
-                        body("Costumer created successfully!");
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).
-                        body("Customer registration failed");
-            }
-        }catch (Exception ex) {
-            log.error("Error during customer registration", ex);
-
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("An internal error occurred.");
-        }
-
-    }
 
     @GetMapping("/user")
     public Customer getUserDetailsAfterLogin(Authentication authentication) {
@@ -77,31 +51,5 @@ public class CustomerController { ///api/v1/customers/register
     }
 
 
-    @PostMapping("/apiLogin")
-    public ResponseEntity<LoginResponseDTO> apiLogin (@RequestBody LoginRequestDTO loginRequest) {
-        String jwt = "";
-        Instant now = Instant.now();
-        Authentication authentication = UsernamePasswordAuthenticationToken.unauthenticated(loginRequest.username(),
-                loginRequest.password());
-        Authentication authenticationResponse = authenticationManager.authenticate(authentication);
-        if(null != authenticationResponse && authenticationResponse.isAuthenticated()) {
-            if (null != env) {
-                String secret = env.getRequiredProperty(ApplicationConstants.JWT_SECRET);
-                SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
-                 jwt = Jwts.builder()
-                        .issuer("https://auth.eazybank.com")
-                        .subject(authenticationResponse.getName())
-                        .claim("authorities",
-                                authenticationResponse.getAuthorities().stream()
-                                        .map(GrantedAuthority::getAuthority)
-                                        .toList())
-                        .issuedAt(Date.from(now))
-                        .expiration(Date.from(now.plus(5, ChronoUnit.MINUTES)))
-                        .signWith(secretKey)
-                        .compact();
-            }
-        }
-        return ResponseEntity.status(HttpStatus.OK).header(ApplicationConstants.JWT_HEADER,jwt)
-                .body(new LoginResponseDTO(HttpStatus.OK.getReasonPhrase(), jwt));
-    }
+
 }
